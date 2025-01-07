@@ -13,15 +13,16 @@ This plugin provides GPS data for the FM-DX web server.
 ## Installation notes:
 
 1. [Download](https://github.com/Highpoint2000/gps/releases) the last repository as a zip
-2. Unpack all files from the plugins folder to ..fm-dx-webserver-main\plugins\ 
-3. Stop or close the fm-dx-webserver
-4. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
-5. Activate the gps plugin in the settings
-6. Stop or close the fm-dx-webserver
-7. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
-8. Configure your personal settings in the automatically created gps.json (in the folder: ../fm-dx-webserver-main/plugins_configs)
-9. Stop or close the fm-dx-webserver
-10. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
+2. Unpack all files from the plugins folder to ..fm-dx-webserver-main\plugins\
+3. Replace the ..fm-dx-webserver-main\server\tx_search.js with the attached one 
+4. Stop or close the fm-dx-webserver
+5. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
+6. Activate the gps plugin in the settings
+7. Stop or close the fm-dx-webserver
+8. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
+9. Configure your personal settings in the automatically created gps.json (in the folder: ../fm-dx-webserver-main/plugins_configs)
+10. Stop or close the fm-dx-webserver
+11. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
 
 ## Configuration options:
 
@@ -34,3 +35,6 @@ The following variables can be changed in the gps.json:
 	UpdateMapInterval: 60,		// Set the interval in s (e.g.: 60) for updating the FM DX server map
 	BeepControl: false,  		// Acoustic control function for gps status (true or false)
 
+## Important notes:
+
+Until the web server is updated, the tx_search.js file in the server directory must be replaced with the attached one!!! Otherwise the location in the web server will not be updated. 
