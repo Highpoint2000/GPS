@@ -1,4 +1,7 @@
 # GPS Plugin for [FM-DX-Webserver](https://github.com/NoobishSVK/fm-dx-webserver)
+
+![image](https://github.com/user-attachments/assets/4d589495-74c8-4e9f-bd69-82f0f4a964f5)
+
  
 This plugin provides GPS data for the FM-DX web server.
 
@@ -28,7 +31,7 @@ The following variables can be changed in the gps.json:
 	GPS_PORT: '',                        // Connection port for GPS receiver (e.g.: 'COM1' or ('/dev/ttyACM0') / if empty then GPS off
     GPS_BAUDRATE: 4800,                  // Baud rate for GPS receiver (e.g.: 4800)        
     GPS_HEIGHT: '',                      // Enter fixed altitude in m (e.g.: '160' ) or leave blank for altitude via GPS signal 
-	UpdateMapPos: true,					// Set the value true or false for updating the FM DX server map
-	UpdateMapInterval: 60,				// Set the interval in s (e.g.: 60) for updating the FM DX server map
-	BeepControl: false,  				// Acoustic control function for gps status (true or false)
+	UpdateMapPos: true,			// Set the value true or false for updating the FM DX server map
+	UpdateMapInterval: 60,			// Set the interval in s (e.g.: 60) for updating the FM DX server map
+	BeepControl: false,  			// Acoustic control function for gps status (true or false)
 
