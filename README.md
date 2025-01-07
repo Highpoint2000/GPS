@@ -1,9 +1,8 @@
 # GPS Plugin for [FM-DX-Webserver](https://github.com/NoobishSVK/fm-dx-webserver)
 
-![image](https://github.com/user-attachments/assets/4d589495-74c8-4e9f-bd69-82f0f4a964f5)
-
- 
 This plugin provides GPS data for the FM-DX web server.
+
+![image](https://github.com/user-attachments/assets/4d589495-74c8-4e9f-bd69-82f0f4a964f5)
 
 ## v1.0
 - Provision of GPS data from compatible GPS receivers (e.g. VK-162) for the web server and plugins
