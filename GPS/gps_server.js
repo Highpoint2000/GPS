@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////
 ///                                                         ///
-///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.0)			///
+///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.0)           ///
 ///                                                         ///
 ///  by Highpoint               last update: 08.01.25       ///
 ///                                                         ///
-///  https://github.com/Highpoint2000/gps    				///
+///  https://github.com/Highpoint2000/gps                   ///
 ///                                                         ///
 ///////////////////////////////////////////////////////////////
 
@@ -376,7 +376,7 @@ logInfo('GPS update interval for FM-DX Server Map is',intervalInMilliseconds / 1
 
 // Execute the function at the defined interval
 setInterval(async () => {
-    if (UpdateMapPos) { // Check if updates are allowed
+    if (UpdateMapPos && currentStatus === 'active') { // Check if updates are allowed
         try {
             await sendUpdateGPSDATA();
         } catch (error) {
