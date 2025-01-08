@@ -79,7 +79,7 @@ let BeepControl = configPlugin.BeepControl;
 
 const sentMessages = new Set();
 const { execSync } = require('child_process');
-const NewModules = ['SerialPort', '@serialport/parser-readline', 'speaker'];
+const NewModules = ['serialport', '@serialport/parser-readline', 'speaker'];
 
 function checkAndInstallNewModules() {
     NewModules.forEach(module => {
