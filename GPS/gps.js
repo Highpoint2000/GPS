@@ -3,7 +3,7 @@
 ///                                                          ///
 ///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V1.0)  			 ///
 ///                                                          ///
-///  by Highpoint                last update: 06.01.25       ///
+///  by Highpoint                last update: 08.01.25       ///
 ///                                                          ///
 ///  https://github.com/Highpoint2000/gps               ///
 ///                                                          ///
@@ -153,7 +153,7 @@ function handleWebSocketMessage(event) {
                         console.log("Server response: GPS Plugin received data");
                         break;
                     case 'inactive':
-                        sendToast('warning', 'GPS Plugin', 'Warning! No received GPS data', false, false);
+                        sendToast('warning', 'GPS Plugin', 'Bad receiption! No received GPS data', false, false);
                         console.warn("Server response: GPS Plugin received no data");
                         break;
                     case 'off':
