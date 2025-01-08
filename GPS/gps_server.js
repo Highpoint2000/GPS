@@ -2,7 +2,7 @@
 ///                                                         ///
 ///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.0)			///
 ///                                                         ///
-///  by Highpoint               last update: 07.01.25       ///
+///  by Highpoint               last update: 08.01.25       ///
 ///                                                         ///
 ///  https://github.com/Highpoint2000/gps    				///
 ///                                                         ///
@@ -196,7 +196,6 @@ function startGPSConnection() {
     } else if (parts[0] === '$GPGGA' && parts.length > 9) {
 
       gpsalt = parts[9];
-	  currentStatus = 'active'
 	  
 	  if (GPS_HEIGHT) {
 		  gpsmode = 2;
@@ -204,6 +203,7 @@ function startGPSConnection() {
       } else if (gpsalt !== undefined && gpsalt !== null && !isNaN(parseFloat(gpsalt))) {
           gpsmode = 3;
 		  ALT = gpsalt;
+		  currentStatus = 'active'
 		}
 	  
 	  //logInfo(`Altitude: ${parseFloat(gpsalt || '0').toFixed(3)} meters, GPSMODE: ${gpsmode}`);
@@ -214,6 +214,7 @@ function startGPSConnection() {
 		GPSmodulOn = true;
 		GPSmodulOff = false;
 		logInfo(`GPS Plugin detected Receiver: ${GPS_PORT} with ${GPS_BAUDRATE} bps`);
+		currentStatus = 'inactive';
 		GPSdetectionOn = false;
 	}
 	
