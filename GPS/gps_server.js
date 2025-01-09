@@ -111,9 +111,11 @@ const WebSocket = require('ws');
 const webserverPort = config.webserver.webserverPort || 8080;
 const externalWsUrl = `ws://127.0.0.1:${webserverPort}`;
 
+let Speaker;
 if (BeepControl) {
-  let Speaker = require('speaker');
+  Speaker = require('speaker');
 }
+
 
 let ws;
 let gpstime;
