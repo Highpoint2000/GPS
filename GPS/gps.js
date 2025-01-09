@@ -172,8 +172,6 @@ function handleWebSocketMessage(event) {
                 // Update the previous status
                 previousStatus = status;
             }
-        } else {
-            console.warn("Unhandled WebSocket message type:", eventData.type);
         }
     } catch (error) {
         console.error("Error handling WebSocket message:", error, "Event data:", event.data);
