@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
 ///                                                         ///
-///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.0)           ///
+///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.0a)          ///
 ///                                                         ///
-///  by Highpoint               last update: 08.01.25       ///
+///  by Highpoint               last update: 09.01.25       ///
 ///                                                         ///
 ///  https://github.com/Highpoint2000/gps                   ///
 ///                                                         ///
@@ -79,7 +79,13 @@ let BeepControl = configPlugin.BeepControl;
 
 const sentMessages = new Set();
 const { execSync } = require('child_process');
-const NewModules = ['serialport', '@serialport/parser-readline', 'speaker'];
+let NewModules;
+
+if (BeepControl) {
+	NewModules = ['serialport', '@serialport/parser-readline', 'speaker'];
+} else {
+	NewModules = ['serialport', '@serialport/parser-readline'];
+}
 
 function checkAndInstallNewModules() {
     NewModules.forEach(module => {
@@ -104,7 +110,11 @@ const { ReadlineParser } = require('@serialport/parser-readline');
 const WebSocket = require('ws');
 const webserverPort = config.webserver.webserverPort || 8080;
 const externalWsUrl = `ws://127.0.0.1:${webserverPort}`;
-let Speaker = require('speaker');
+
+if (BeepControl) {
+  let Speaker = require('speaker');
+}
+
 let ws;
 let gpstime;
 let ALT = GPS_HEIGHT;
