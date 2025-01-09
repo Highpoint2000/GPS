@@ -1,9 +1,9 @@
 (() => {
 ////////////////////////////////////////////////////////////////
 ///                                                          ///
-///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V1.0)  			 ///
+///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V1.0a)  		 ///
 ///                                                          ///
-///  by Highpoint                last update: 08.01.25       ///
+///  by Highpoint                last update: 09.01.25       ///
 ///                                                          ///
 ///  https://github.com/Highpoint2000/gps               ///
 ///                                                          ///
@@ -13,7 +13,7 @@ const updateInfo = true; // Enable or disable version check
 
 /////////////////////////////////////////////////////////////////
 
-    const plugin_version = '1.0';
+    const plugin_version = '1.0a';
 	const plugin_path = 'https://raw.githubusercontent.com/highpoint2000/GPS/';
 	const plugin_JSfile = 'main/GPS/gps.js'
 	const plugin_name = 'GPS Plugin'; 
