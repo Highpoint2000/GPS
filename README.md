@@ -4,11 +4,9 @@ This plugin provides GPS data for the FM-DX web server.
 
 ![image](https://github.com/user-attachments/assets/4d589495-74c8-4e9f-bd69-82f0f4a964f5)
 
-## v1.0
-- Provision of GPS data from compatible GPS receivers (e.g. VK-162) for the web server and plugins
-- Acoustic signaling for gps status (Optional setting in gps.json)
-- Updating the FMDX server map with the GPS coordinates (Interval adjustable - min. 15 seconds)
-- Daily update check for admin
+## v1.0a
+
+- node.js module speaker is only loaded if the sound control has been activated (some Linux systems have problems with the sound output!)
 
 ## Installation notes:
 
@@ -36,5 +34,12 @@ The following variables can be changed in the gps.json:
 	BeepControl: false,  		// Acoustic control function for gps status (true or false)
 
 ## Important notes:
+
+### v1.0
+
+- Provision of GPS data from compatible GPS receivers (e.g. VK-162) for the web server and plugins
+- Acoustic signaling for gps status (Optional setting in gps.json)
+- Updating the FMDX server map with the GPS coordinates (Interval adjustable - min. 15 seconds)
+- Daily update check for admin
 
 Until the web server is updated, the tx_search.js file in the server directory must be replaced with the attached one!!! Otherwise the location in the web server will not be updated. 
