@@ -5,7 +5,7 @@
 ///                                                          ///
 ///  by Highpoint                last update: 09.01.25       ///
 ///                                                          ///
-///  https://github.com/Highpoint2000/gps               ///
+///  https://github.com/Highpoint2000/gps                    ///
 ///                                                          ///
 ////////////////////////////////////////////////////////////////
 
