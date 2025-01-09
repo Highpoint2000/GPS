@@ -6,7 +6,8 @@ This plugin provides GPS data for the FM-DX web server.
 
 ## v1.0a
 
-- node.js module speaker is only loaded if the sound control has been activated (some Linux systems have problems with the sound output!)
+- Node.js module speaker is only loaded if the sound control has been activated (some Linux systems have problems with the sound output!)
+- Fixed problems with update info
 
 ## Installation notes:
 
