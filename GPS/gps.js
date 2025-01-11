@@ -1,9 +1,9 @@
 (() => {
 ////////////////////////////////////////////////////////////////
 ///                                                          ///
-///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V1.0a)  		 ///
+///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V1.1)            ///
 ///                                                          ///
-///  by Highpoint                last update: 09.01.25       ///
+///  by Highpoint                last update: 11.01.25       ///
 ///                                                          ///
 ///  https://github.com/Highpoint2000/gps                    ///
 ///                                                          ///
@@ -13,7 +13,7 @@ const updateInfo = true; // Enable or disable version check
 
 /////////////////////////////////////////////////////////////////
 
-    const plugin_version = '1.0a';
+    const plugin_version = '1.1';
 	const plugin_path = 'https://raw.githubusercontent.com/highpoint2000/GPS/';
 	const plugin_JSfile = 'main/GPS/gps.js'
 	const plugin_name = 'GPS Plugin'; 
@@ -186,10 +186,8 @@ function handleWebSocketMessage(event) {
     }
 	
 	// Initialize the alert button once the DOM is fully loaded
-    setTimeout(() => {
-        setupWebSocket();
-        checkAdminMode();
-     }, 1000);
+    setupWebSocket();
+    checkAdminMode();
 	
 	setTimeout(() => {
 	// Execute the plugin version check if updateInfo is true and admin ist logged on
