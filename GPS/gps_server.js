@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
 ///                                                         ///
-///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.0a)          ///
+///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.1)           ///
 ///                                                         ///
-///  by Highpoint               last update: 09.01.25       ///
+///  by Highpoint               last update: 11.01.25       ///
 ///                                                         ///
 ///  https://github.com/Highpoint2000/gps                   ///
 ///                                                         ///
@@ -81,10 +81,14 @@ const sentMessages = new Set();
 const { execSync } = require('child_process');
 let NewModules;
 
+NewModules = ['serialport', '@serialport/parser-readline'];
+
 if (BeepControl) {
-	NewModules = ['serialport', '@serialport/parser-readline', 'speaker'];
-} else {
-	NewModules = ['serialport', '@serialport/parser-readline'];
+    NewModules.push('speaker');
+}
+
+if (GPS_PORT === 'gpsd') {
+    NewModules.push('child_process');
 }
 
 function checkAndInstallNewModules() {
@@ -138,166 +142,213 @@ let GPSTIME;
 let port;
 let parser;
 let gpsDetectionInterval;
+let lastStatus = null;
+
+const { spawn } = require('child_process');
 
 function startGPSConnection() {
-  const gpsBaudRate = Number(GPS_BAUDRATE) || 4800;
+  if (GPS_PORT === 'gpsd') {
+    logInfo('GPS Plugin using gpsd for GPS data');
+    const gpsPipe = spawn('gpspipe', ['-w']);
 
-  // Open the port only if it's not open
-  if (!port || port.isOpen === false) {
-    port = new SerialPort({ path: GPS_PORT, baudRate: gpsBaudRate });
-    parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
-  }
+    gpsPipe.stdout.on('data', (data) => {
+      try {
+        const lines = data.toString().trim().split('\n');
+        lines.forEach((line) => {
+          const gpsData = JSON.parse(line);
 
-  // Function to convert coordinates to decimal degrees
-  function convertToDecimalDegrees(degree, minute) {
-    return degree + minute / 60;
-  }
+          if (gpsData.class === 'TPV') {
+            LAT = gpsData.lat;
+            LON = gpsData.lon;
+            ALT = gpsData.alt;
+            gpstime = gpsData.time;
+            gpsmode = gpsData.mode;
+			
+			if (GPS_HEIGHT) {
+				gpsmode = 2;
+				ALT = GPS_HEIGHT;
+			} else if (gpsalt !== undefined && gpsalt !== null && !isNaN(parseFloat(gpsalt))) {
+				gpsmode = 3;
+				ALT = gpsalt;
+			}
 
-  // Function to format time into hh:mm:ss
-  function formatTime(time) {
-    const hours = time.slice(0, 2);
-    const minutes = time.slice(2, 4);
-    const seconds = time.slice(4, 6);
-    return `${hours}:${minutes}:${seconds}`;
-  }
+            const currentLatValid = LAT !== undefined && LAT !== null && !isNaN(parseFloat(LAT));
+            const newStatus = currentLatValid ? 'active' : 'inactive';
 
-  // Function to format GPS date and time into UTC format
-  function formatDateTime(date, time) {
-    const year = `20${date.slice(4, 6)}`; // Year (e.g., 231205 -> 2023)
-    const month = date.slice(2, 4);
-    const day = date.slice(0, 2);
-    const formattedTime = formatTime(time);
-    return `${year}-${month}-${day}T${formattedTime}Z`;
-  }
+            if (newStatus !== lastStatus) {
+              currentStatus = newStatus;
+              lastStatus = newStatus;
 
-  // Read and process data
-  parser.on('data', (data) => {
-    const parts = data.split(',');
-
-    if (parts[0] === '$GPRMC' && parts.length > 5) {
-      const date = parts[9];
-      const time = parts[1];
-      const status = parts[2];
-      const latitude = parts[3];
-      const latitudeDirection = parts[4];
-      const longitude = parts[5];
-      const longitudeDirection = parts[6];
-
-      if (status === 'A') {
-        const latDegrees = parseFloat(latitude.slice(0, 2));
-        const latMinutes = parseFloat(latitude.slice(2));
-        const latDecimal = convertToDecimalDegrees(latDegrees, latMinutes);
-
-        const lonDegrees = parseFloat(longitude.slice(0, 3));
-        const lonMinutes = parseFloat(longitude.slice(3));
-        const lonDecimal = convertToDecimalDegrees(lonDegrees, lonMinutes);
-
-        LAT = latitudeDirection === 'S' ? -latDecimal : latDecimal;
-        LON = longitudeDirection === 'W' ? -lonDecimal : lonDecimal;
-
-        const gpstime = formatDateTime(date, time);
-		currentStatus = 'active'
+              if (currentStatus === 'active' && BeepControl) {
+                fs.createReadStream('./plugins/GPS/sounds/beep_short_double.wav').pipe(new Speaker());
+              } else if (currentStatus === 'inactive' && BeepControl) {
+                fs.createReadStream('./plugins/GPS/sounds/beep_long_double.wav').pipe(new Speaker());
+              }
+            }
+          }
+        });
 		
-		//LAT = 53.067627000;   //Test coordinates 
-		//LON = 9.823837;
-		
-		//logInfo(`Time: ${gpstime}, Latitude: ${LAT.toFixed(9)}, Longitude: ${LON.toFixed(9)}`);
-		
+      } catch (err) {
+        logError(`GPS Plugin Error parsing gpsd data: ${err.message}`);
       }
-	  
-    } else if (parts[0] === '$GPGGA' && parts.length > 9) {
+    });
 
-      gpsalt = parts[9];
+    gpsPipe.stderr.on('data', (data) => {
+      logError(`GPS Plugin gpspipe error: ${data}`);
+    });
+
+    gpsPipe.on('close', (code) => {
+      logWarn(`GPS Plugin gpspipe process exited with code ${code}`);
+    });
+	
+  } else {
 	  
-	  if (GPS_HEIGHT) {
-		  gpsmode = 2;
-		  ALT = GPS_HEIGHT;
-      } else if (gpsalt !== undefined && gpsalt !== null && !isNaN(parseFloat(gpsalt))) {
+	const gpsBaudRate = Number(GPS_BAUDRATE) || 4800;
+	
+    // Open the port only if it's not open
+    if (!port || port.isOpen === false) {
+      port = new SerialPort({ path: GPS_PORT, baudRate: gpsBaudRate });
+      parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
+    }
+
+    // Function to convert coordinates to decimal degrees
+    function convertToDecimalDegrees(degree, minute) {
+      return degree + minute / 60;
+    }
+
+    // Function to format time into hh:mm:ss
+    function formatTime(time) {
+      const hours = time.slice(0, 2);
+      const minutes = time.slice(2, 4);
+      const seconds = time.slice(4, 6);
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    // Function to format GPS date and time into UTC format
+    function formatDateTime(date, time) {
+      const year = `20${date.slice(4, 6)}`; // Year (e.g., 231205 -> 2023)
+      const month = date.slice(2, 4);
+      const day = date.slice(0, 2);
+      const formattedTime = formatTime(time);
+      return `${year}-${month}-${day}T${formattedTime}Z`;
+    }
+
+    // Read and process data
+    parser.on('data', (data) => {
+      const parts = data.split(',');
+
+      if (parts[0] === '$GPRMC' && parts.length > 5) {
+        const date = parts[9];
+        const time = parts[1];
+        const status = parts[2];
+        const latitude = parts[3];
+        const latitudeDirection = parts[4];
+        const longitude = parts[5];
+        const longitudeDirection = parts[6];
+
+        if (status === 'A') {
+          const latDegrees = parseFloat(latitude.slice(0, 2));
+          const latMinutes = parseFloat(latitude.slice(2));
+          const latDecimal = convertToDecimalDegrees(latDegrees, latMinutes);
+
+          const lonDegrees = parseFloat(longitude.slice(0, 3));
+          const lonMinutes = parseFloat(longitude.slice(3));
+          const lonDecimal = convertToDecimalDegrees(lonDegrees, lonMinutes);
+
+          LAT = latitudeDirection === 'S' ? -latDecimal : latDecimal;
+          LON = longitudeDirection === 'W' ? -lonDecimal : lonDecimal;
+
+          gpstime = formatDateTime(date, time);
+          currentStatus = 'active';
+
+          //logInfo(`Time: ${gpstime}, Latitude: ${LAT.toFixed(9)}, Longitude: ${LON.toFixed(9)}`);
+        }
+      } else if (parts[0] === '$GPGGA' && parts.length > 9) {
+        gpsalt = parts[9];
+
+        if (GPS_HEIGHT) {
+          gpsmode = 2;
+          ALT = GPS_HEIGHT;
+        } else if (gpsalt !== undefined && gpsalt !== null && !isNaN(parseFloat(gpsalt))) {
           gpsmode = 3;
-		  ALT = gpsalt;
-		  currentStatus = 'active'
-		}
-	  
-	  //logInfo(`Altitude: ${parseFloat(gpsalt || '0').toFixed(3)} meters, GPSMODE: ${gpsmode}`);
-	  
-    } 
-	
-	if (!GPSmodulOn) {
-		GPSmodulOn = true;
-		GPSmodulOff = false;
-		logInfo(`GPS Plugin detected Receiver: ${GPS_PORT} with ${GPS_BAUDRATE} bps`);
-		currentStatus = 'inactive';
-		GPSdetectionOn = false;
-	}
-	
-	if (!GPSdetectionOn && currentStatus === 'active') {
+          ALT = gpsalt;
+          currentStatus = 'active';
+        }
+
+        //logInfo(`Altitude: ${parseFloat(gpsalt || '0').toFixed(3)} meters, GPSMODE: ${gpsmode}`);
+      }
+
+      if (!GPSmodulOn) {
+        GPSmodulOn = true;
+        GPSmodulOff = false;
+        logInfo(`GPS Plugin detected Receiver: ${GPS_PORT} with ${GPS_BAUDRATE} bps`);
+        currentStatus = 'inactive';
+        GPSdetectionOn = false;
+      }
+
+      if (!GPSdetectionOn && currentStatus === 'active') {
         logInfo(`GPS Plugin received data`);
         GPSdetectionOn = true;
         GPSdetectionOff = false;
-        if (BeepControl) {
-          fs.createReadStream('./plugins/GPS/sounds/beep_short_tripple.wav').pipe(new Speaker());
-        }
-    }
-
-	if (!GPSdetectionOff && currentStatus === 'inactive') {
-      logWarn(`GPS Plugin received no data `);
-      GPSdetectionOff = true;
-      GPSdetectionOn = false;
-
-      if (BeepControl) {
-        fs.createReadStream('./plugins/GPS/sounds/beep_middlelong.wav').pipe(new Speaker());
+		if (BeepControl) {
+			fs.createReadStream('./plugins/GPS/sounds/beep_short_double.wav').pipe(new Speaker());
+		}
       }
 
-    }
-
-  });
-
-  // Error handling for the serial port
-  port.on('error', (err) => {
-    if (!GPSmodulOff) {
-      logError(`GPS Plugin Error: ${err.message}`);
-      GPSmodulOff = true;
-      GPSmodulOn = false;
-	  GPSdetectionOn = false;
-	  currentStatus = 'inactive'
-	  
-      if (BeepControl) {
-        fs.createReadStream('./plugins/GPS/sounds/beep_extralong.wav').pipe(new Speaker());
+      if (!GPSdetectionOff && currentStatus === 'inactive') {
+        logWarn(`GPS Plugin received no data `);
+        GPSdetectionOff = true;
+        GPSdetectionOn = false;
+		if (BeepControl) {
+			fs.createReadStream('./plugins/GPS/sounds/beep_long_double.wav').pipe(new Speaker());
+		}
       }
-    }
+    });
 
-    // Retry logic to handle connection loss
-    setTimeout(() => {
-      startGPSConnection(); // Attempt to reconnect
-    }, 5000); // Retry after 5 seconds
-  });
-
-  // Monitor connection close and restart if necessary
-  port.on('close', () => {
-    if (!GPSmodulOff) {
-      logError(`GPS Plugin Error: Connection closed`);
-      GPSmodulOff = true;
-	  GPSmodulOn = false;
-	  currentStatus = 'error';
-
-      if (BeepControl) {
-        fs.createReadStream('./plugins/GPS/sounds/beep_extralong.wav').pipe(new Speaker());
+    // Error handling for the serial port
+    port.on('error', (err) => {
+      if (!GPSmodulOff) {
+        logError(`GPS Plugin Error: ${err.message}`);
+        GPSmodulOff = true;
+        GPSmodulOn = false;
+        GPSdetectionOn = false;
+        currentStatus = 'inactive';
+		if (BeepControl) {
+			fs.createReadStream('./plugins/GPS/sounds/beep_long_double.wav').pipe(new Speaker());
+		}
       }
 
-    }
-    setTimeout(() => {
-      startGPSConnection(); // Retry after 5 seconds
-    }, 5000);
-  });
+      // Retry logic to handle connection loss
+      setTimeout(() => {
+        startGPSConnection(); // Attempt to reconnect
+      }, 5000); // Retry after 5 seconds
+    });
+
+    // Monitor connection close and restart if necessary
+    port.on('close', () => {
+      if (!GPSmodulOff) {
+        logError(`GPS Plugin Error: Connection closed`);
+        GPSmodulOff = true;
+        GPSmodulOn = false;
+        currentStatus = 'error';
+		if (BeepControl) {
+			fs.createReadStream('./plugins/GPS/sounds/beep_long_double.wav').pipe(new Speaker());
+		}
+      }
+
+      setTimeout(() => {
+        startGPSConnection(); // Retry after 5 seconds
+      }, 5000);
+    });
+  }
 }
-
 
 // Function to check if the GPS is connected and try to reconnect
 function checkGPSConnection() {
   if (GPS_PORT && GPS_BAUDRATE && (!port || !port.isOpen)) {
     logWarn('GPS Plugin lost connection. Attempting to reconnect...');
     startGPSConnection();
-	currentStatus = 'inactive';
+    currentStatus = 'inactive';
   }
 }
 
@@ -305,12 +356,13 @@ function checkGPSConnection() {
 gpsDetectionInterval = setInterval(checkGPSConnection, 60000); // Check every 60 seconds
 
 // Initialize GPS Connection
-if (GPS_PORT && GPS_BAUDRATE) {
-  logInfo('GPS Plugin starting connection ...');
+if (GPS_PORT) {
+  logInfo('GPS Plugin starting connection...');
   startGPSConnection();
 }
 
 /////////////////////////////////////////////  GPS END //////////////////////////////////////////////////////////////////
+
 
 async function sendGPSDATA(request) {
     //logInfo('GPS sending request:', request);
