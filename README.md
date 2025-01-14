@@ -8,6 +8,8 @@ This plugin provides GPS data for the FM-DX web server.
 
 - gpsd has been implemented, to do this, set the GPS_PORT to 'gpsd'
 
+Until the web server is updated, the tx_search.js file in the server directory must be replaced with the attached one!!! Otherwise the location in the web server will not be updated. 
+
 ## Installation notes:
 
 1. [Download](https://github.com/Highpoint2000/gps/releases) the last repository as a zip
