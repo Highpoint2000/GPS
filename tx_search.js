@@ -44,7 +44,6 @@ setTimeout(() => {
 
 }, 5000);
 
-
 // Load the US states GeoJSON data
 async function loadUsStatesGeoJson() {
     if (!usStatesGeoJson) {
@@ -102,7 +101,6 @@ async function fetchTx(freq, piCode, rdsPs) {
     if (isNaN(freq)) {
         return;
     }
-
     if (now - lastFetchTime < fetchInterval || Latitude.length < 2 || freq < 87) {
         return Promise.resolve();
     }
@@ -144,7 +142,8 @@ async function processData(data, piCode, rdsPs) {
             weightDistance = Math.abs(distance.distanceKm - 1500);
         }
         let erp = station.erp && station.erp > 0 ? station.erp : 1;
-        const score = (10 * Math.log10(erp * 1000)) / weightDistance;
+        let extraWeight = erp >= 10 && distance.distanceKm <= 400 ? 0.3 : 0;
+        const score = ((10 * Math.log10(erp * 1000)) / weightDistance) + extraWeight;
         if (score > maxScore) {
             maxScore = score;
             txAzimuth = distance.azimuth;
@@ -175,7 +174,7 @@ async function processData(data, piCode, rdsPs) {
             if (city.stations) {
                 for (const station of city.stations) {
                     if (station.pireg && station.pireg.toUpperCase() === piCode.toUpperCase() && !station.extra && station.ps && station.ps.toLowerCase().includes(rdsPs.replace(/ /g, '_').replace(/^_*(.*?)_*$/, '$1').toLowerCase())) {
-                        const distance = haversine(Latitude, Longitude, city.lat, city.lon);
+                        const distance = haversine(serverConfig.identification.lat, serverConfig.identification.lon, city.lat, city.lon);
                         evaluateStation(station, city, distance);
                         detectedByPireg = true;
                     }
@@ -218,12 +217,12 @@ function checkEs() {
 
     if (now - esSwitchCache.lastCheck < esFetchInterval) {
         esSwitch = esSwitchCache.esSwitch;
-    } else if (Latitude > 20) {
+    } else if (serverConfig.identification.lat > 20) {
         esSwitchCache.lastCheck = now;
         fetch(url)
         .then(response => response.json())
         .then(data => {
-            if (Longitude < -32) {
+            if (serverConfig.identification.lon < -32) {
                 if (data.north_america.max_frequency != "No data") {
                     esSwitch = true;
                 }
