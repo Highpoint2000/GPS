@@ -4,9 +4,9 @@ This plugin provides GPS data for the FM-DX web server.
 
 ![image](https://github.com/user-attachments/assets/4d589495-74c8-4e9f-bd69-82f0f4a964f5)
 
-## v1.1
+## v1.2
 
-- gpsd has been implemented, to do this, set the GPS_PORT to 'gpsd'
+- Fixed problems updating map status
 
 Until the web server is updated, the tx_search.js file in the server directory must be replaced with the attached one!!! Otherwise the location in the web server will not be updated. 
 
@@ -41,6 +41,10 @@ To youse gpsd set the GPS_PORT to 'gpsd' and make sure that only data in NMEA fo
 
 
 ## History:
+
+### v1.1
+
+- gpsd has been implemented, to do this, set the GPS_PORT to 'gpsd'
 
 ### v1.0a
 
