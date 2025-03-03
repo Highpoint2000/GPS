@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
 ///                                                         ///
-///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.1)           ///
+///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V1.2)           ///
 ///                                                         ///
-///  by Highpoint               last update: 11.01.25       ///
+///  by Highpoint               last update: 03.03.25       ///
 ///                                                         ///
 ///  https://github.com/Highpoint2000/gps                   ///
 ///                                                         ///
@@ -26,6 +26,9 @@ const fs = require('fs');
 const { logInfo, logError, logWarn } = require('./../../server/console');
 const ConfigFilePath = path.join(__dirname, './../../plugins_configs/gps.json');
 const config = require('./../../config.json');
+const { serverConfig, configUpdate, configSave } = require('./../../server/server_config');
+var pjson = require('./../../package.json');
+var os = require('os');
 
 // Function to merge default config with existing config and remove undefined values
 function mergeConfig(defaultConfig, existingConfig) {
@@ -407,22 +410,51 @@ async function sendGPSDATA(request) {
 }
 
 function sendUpdateGPSDATA() {
+	
+	let currentOs = os.type() + ' ' + os.release();
+
+	let bwLimit = '';
+	if (serverConfig.webserver.tuningLimit === true) {
+		bwLimit = serverConfig.webserver.tuningLowerLimit + ' - ' + serverConfig.webserver.tuningUpperLimit + ' MHz';
+	}
 
 	const request = {
-        status: 2,
+        status: ((serverConfig.lockToAdmin || !serverConfig.publicTuner) ? 2 : 1),
         coords: [
             parseFloat(GPSLAT).toFixed(6),
-            parseFloat(GPSLON).toFixed(6)
-        ]
+            parseFloat(GPSLON).toFixed(6),
+        ],
+		name: serverConfig.identification.tunerName,
+		desc: serverConfig.identification.tunerDesc,
+		audioChannels: serverConfig.audio.audioChannels,
+		audioQuality: serverConfig.audio.audioBitrate,
+		contact: serverConfig.identification.contact || '',
+		tuner: serverConfig.device || '',
+		bwLimit: bwLimit,
+		os: currentOs,
+		version: pjson.version 
     };
 
-    if (config.identification.token) {
-        request.token = config.identification.token;
-    }
+	if (serverConfig.identification.token)
+	{
+		request.token = serverConfig.identification.token;
+	}
+
+	if (serverConfig.identification.proxyIp.length)
+	{
+		request.url = serverConfig.identification.proxyIp;
+	}
+	else
+	{
+		request.port = serverConfig.webserver.webserverPort;
+	}
 
     return sendGPSDATA(request).then((response) => {
         if (response.token && response.success) {
             logInfo("GPS update FM-DX Server Map:",parseFloat(GPSLAT).toFixed(6),parseFloat(GPSLON).toFixed(6),"successful");
+			//console.log(serverConfig.lockToAdmin);
+			//console.log(serverConfig.publicTuner);
+			//console.log(request.status);
 			if (BeepControl) {
 				fs.createReadStream('./plugins/GPS/sounds/beep_short.wav').pipe(new Speaker());
 			}
