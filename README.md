@@ -7,7 +7,7 @@ This plugin provides GPS data for the FM-DX web server.
 
 ## v2.0
 
-- Added GPS Button to toggle the GPS Live Monitor
+- Added GPS Button to toggle the GPS Live Monitor (movable)
 - Added GPS simulation mode (to be activated in the header of gps_server.js)
 
 Until the web server is updated, the tx_search.js file in the server directory must be replaced with the attached one!!! Otherwise the location in the web server will not be updated. 
