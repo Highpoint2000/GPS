@@ -2,11 +2,13 @@
 
 This plugin provides GPS data for the FM-DX web server.
 
-![image](https://github.com/user-attachments/assets/4d589495-74c8-4e9f-bd69-82f0f4a964f5)
+![image](https://github.com/user-attachments/assets/d6f84f67-be91-4e74-9e1a-93e884d790a5)
 
-## v1.2
 
-- Fixed problems updating map status
+## v2.0
+
+- Added GPS Button to toggle the GPS Live Monitor
+- Added GPS simulation mode (to be activated in the header of gps_server.js)
 
 Until the web server is updated, the tx_search.js file in the server directory must be replaced with the attached one!!! Otherwise the location in the web server will not be updated. 
 
@@ -35,12 +37,23 @@ The following variables can be changed in the gps.json:
 	UpdateMapInterval: 60,		// Set the interval in s (e.g.: 60) for updating the FM DX server map
 	BeepControl: false,  		// Acoustic control function for gps status (true or false)
 
+The following variables can be changed in the gps_server.js:
+
+        const SIMULATE_GPS = false;      // true = simulate GPS, false = use real GPS
+        const simulatedLat = 52.520008; // Example latitude (Berlin with small random noise)
+        const simulatedLon = 13.404954; // Example longitude (Berlin with small random noise)
+        const simulatedAlt = 35;        //height in meters
+
 ## Important notes:
 
 To youse gpsd set the GPS_PORT to 'gpsd' and make sure that only data in NMEA format is transmitted via the interface. If necessary, use the command: sudo gpsctl -n
 
 
 ## History:
+
+### v1.2
+
+- Fixed problems updating map status
 
 ### v1.1
 
