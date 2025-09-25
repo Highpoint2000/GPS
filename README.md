@@ -16,7 +16,7 @@ Until the web server is updated, the tx_search.js file in the server directory m
 
 1. [Download](https://github.com/Highpoint2000/gps/releases) the last repository as a zip
 2. Unpack all files from the plugins folder to ..fm-dx-webserver-main\plugins\
-3. Replace the ..fm-dx-webserver-main\server\tx_search.js with the attached one 
+3. Replace the ..fm-dx-webserver-main\server\tx_search.js with the attached one (Only required for web server versions below 1.3.11!)
 4. Stop or close the fm-dx-webserver
 5. Start/Restart the fm-dx-webserver with "npm run webserver" on node.js console, check the console informations
 6. Activate the gps plugin in the settings
