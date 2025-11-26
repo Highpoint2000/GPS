@@ -1,9 +1,9 @@
 (() => {
   ////////////////////////////////////////////////////////////////
   ///                                                          ///
-  ///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V2.0)            ///
+  ///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V2.0a)           ///
   ///                                                          ///
-  ///  by Highpoint                last update: 26.05.25       ///
+  ///  by Highpoint                last update: 26.11.25       ///
   ///                                                          ///
   ///  https://github.com/Highpoint2000/gps                    ///
   ///                                                          ///
@@ -17,7 +17,7 @@
 
   // Plugin metadata
   
-  const pluginVersion = '2.0';
+  const pluginVersion = '2.0a';
   const pluginName = "GPS";
   const pluginHomepageUrl = "https://github.com/Highpoint2000/GPS/releases";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/highpoint2000/GPS/main/GPS/gps.js";

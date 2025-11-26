@@ -1,7 +1,7 @@
 // Plugin configuration, this is used in the administration when plugins are loaded
 var pluginConfig = {
     name: 'GPS Plugin',
-    version: '2.0',
+    version: '2.0a',
     author: 'Highpoint',
     frontEndPath: 'GPS/gps.js'
 }

@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
 ///                                                         ///
-///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V2.0)           ///
+///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V2.0a)          ///
 ///                                                         ///
-///  by Highpoint               last update: 26.05.25       ///
+///  by Highpoint               last update: 26.11.25       ///
 ///                                                         ///
 ///  https://github.com/Highpoint2000/gps                   ///
 ///                                                         ///
