@@ -1,9 +1,9 @@
 (() => {
   ////////////////////////////////////////////////////////////////
   ///                                                          ///
-  ///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V2.0a)           ///
+  ///  GPS CLIENT SCRIPT FOR FM-DX-WEBSERVER (V2.0b)           ///
   ///                                                          ///
-  ///  by Highpoint                last update: 26.11.25       ///
+  ///  by Highpoint                last update: 24.01.26       ///
   ///                                                          ///
   ///  https://github.com/Highpoint2000/gps                    ///
   ///                                                          ///
@@ -17,7 +17,7 @@
 
   // Plugin metadata
   
-  const pluginVersion = '2.0a';
+  const pluginVersion = '2.0b';
   const pluginName = "GPS";
   const pluginHomepageUrl = "https://github.com/Highpoint2000/GPS/releases";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/highpoint2000/GPS/main/GPS/gps.js";
@@ -31,6 +31,15 @@
   const proto = url.protocol === 'https:' ? 'wss:' : 'ws:';
   const WS_URL = `${proto}//${host}:${port}${path}data_plugins`;
   let ws = null;
+  
+// ------------------------------------------------------------------
+// Fallback for sendToast() if not provided by the main webserver UI
+// ------------------------------------------------------------------
+if (typeof sendToast !== "function") {
+  window.sendToast = function (cls, src, txt) {
+    console.log(`[TOAST-Fallback] ${src}: ${cls} → ${txt}`);
+  };
+}
 
 // Function for update notification in /setup
 function checkUpdate(setupOnly, pluginName, urlUpdateLink, urlFetchLink) {
@@ -190,7 +199,6 @@ if (CHECK_FOR_UPDATES) checkUpdate(pluginSetupOnlyNotify, pluginName, pluginHome
 
   setupWebSocket();
   checkAdmin();
-  setTimeout(() => { if (updateInfo && isAuth) checkPluginVersion(); }, 200);
 
   // ------------- Leaflet Inclusion ----------------
   const leafletCSS = document.createElement('link');

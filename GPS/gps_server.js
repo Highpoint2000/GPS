@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////
 ///                                                         ///
-///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V2.0a)          ///
+///  GPS SERVER SCRIPT FOR FM-DX-WEBSERVER (V2.0b)          ///
 ///                                                         ///
-///  by Highpoint               last update: 26.11.25       ///
+///  by Highpoint               last update: 24.01.26       ///
 ///                                                         ///
 ///  https://github.com/Highpoint2000/gps                   ///
 ///                                                         ///
@@ -257,14 +257,24 @@ function startGPSConnection() {
             if (!port || port.isOpen === false) {
                 port = new SerialPort({ path: GPS_PORT, baudRate: gpsBaudRate });
                 parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
+            } else if (!parser) {
+                // Safety: if port exists but parser doesn't, recreate parser
+                parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
             }
 
-            // Function to convert coordinates to decimal degrees
+            // Prevent duplicate listeners if startGPSConnection() is called again (reconnect logic)
+            if (parser) parser.removeAllListeners('data');
+            if (port) {
+                port.removeAllListeners('error');
+                port.removeAllListeners('close');
+            }
+
+            // Convert coordinates to decimal degrees
             function convertToDecimalDegrees(degree, minute) {
                 return degree + minute / 60;
             }
 
-            // Function to format time into hh:mm:ss
+            // Format time into hh:mm:ss
             function formatTime(time) {
                 const hours = time.slice(0, 2);
                 const minutes = time.slice(2, 4);
@@ -272,7 +282,7 @@ function startGPSConnection() {
                 return `${hours}:${minutes}:${seconds}`;
             }
 
-            // Function to format GPS date and time into UTC format
+            // Format GPS date + time into UTC ISO string
             function formatDateTime(date, time) {
                 const year = `20${date.slice(4, 6)}`; // Year (e.g., 231205 -> 2023)
                 const month = date.slice(2, 4);
@@ -281,35 +291,62 @@ function startGPSConnection() {
                 return `${year}-${month}-${day}T${formattedTime}Z`;
             }
 
+            // Get NMEA sentence type (supports $GPRMC, $GNRMC, $GLRMC, $GARMC, ... => "RMC")
+            function getNmeaType(header) {
+                if (!header) return '';
+                const h = String(header).trim();
+                // NMEA headers look like: $ + Talker(2) + Type(3) e.g. $GPRMC, $GNGGA
+                if (h.startsWith('$') && h.length >= 6) return h.substring(3, 6);
+                return '';
+            }
+
             // Read and process data
             parser.on('data', (data) => {
-                const parts = data.split(',');
+                const line = String(data || '').trim(); // trims trailing \r too
+                if (!line) return;
 
-                if (parts[0] === '$GPRMC' && parts.length > 5) {
-                    const date = parts[9];
+                const parts = line.split(',');
+                const header = (parts[0] || '').trim();
+                const msgType = getNmeaType(header);
+
+                // --- RMC (Recommended Minimum) ---
+                // Works for: $GPRMC, $GNRMC, $GLRMC, $GARMC, $BDRMC, $QZRMC, ...
+                if (msgType === 'RMC' && parts.length > 9) {
                     const time = parts[1];
                     const status = parts[2];
                     const latitude = parts[3];
                     const latitudeDirection = parts[4];
                     const longitude = parts[5];
                     const longitudeDirection = parts[6];
+                    const date = parts[9];
 
-                    if (status === 'A') {
+                    if (status === 'A' && latitude && longitude && latitudeDirection && longitudeDirection) {
                         const latDegrees = parseFloat(latitude.slice(0, 2));
                         const latMinutes = parseFloat(latitude.slice(2));
-                        const latDecimal = convertToDecimalDegrees(latDegrees, latMinutes);
-
                         const lonDegrees = parseFloat(longitude.slice(0, 3));
                         const lonMinutes = parseFloat(longitude.slice(3));
-                        const lonDecimal = convertToDecimalDegrees(lonDegrees, lonMinutes);
 
-                        LAT = latitudeDirection === 'S' ? -latDecimal : latDecimal;
-                        LON = longitudeDirection === 'W' ? -lonDecimal : lonDecimal;
+                        if (!isNaN(latDegrees) && !isNaN(latMinutes) && !isNaN(lonDegrees) && !isNaN(lonMinutes)) {
+                            const latDecimal = convertToDecimalDegrees(latDegrees, latMinutes);
+                            const lonDecimal = convertToDecimalDegrees(lonDegrees, lonMinutes);
 
-                        gpstime = formatDateTime(date, time);
-                        currentStatus = 'active';
+                            LAT = latitudeDirection === 'S' ? -latDecimal : latDecimal;
+                            LON = longitudeDirection === 'W' ? -lonDecimal : lonDecimal;
+
+                            if (date && time && date.length >= 6 && time.length >= 6) {
+                                gpstime = formatDateTime(date, time);
+                            }
+
+                            currentStatus = 'active';
+                        }
+                    } else {
+                        // If RMC is present but not valid (status V), mark inactive
+                        currentStatus = 'inactive';
                     }
-                } else if (parts[0] === '$GPGGA' && parts.length > 9) {
+
+                // --- GGA (Fix Data) ---
+                // Works for: $GPGGA, $GNGGA, $GLGGA, $GAGGA, ...
+                } else if (msgType === 'GGA' && parts.length > 9) {
                     gpsalt = parts[9];
 
                     if (GPS_HEIGHT) {
@@ -322,6 +359,7 @@ function startGPSConnection() {
                     }
                 }
 
+                // Receiver detected (first time)
                 if (!GPSmodulOn) {
                     GPSmodulOn = true;
                     GPSmodulOff = false;
@@ -330,6 +368,7 @@ function startGPSConnection() {
                     GPSdetectionOn = false;
                 }
 
+                // Status transitions / beeps
                 if (!GPSdetectionOn && currentStatus === 'active') {
                     logInfo(`GPS Plugin received data`);
                     GPSdetectionOn = true;
