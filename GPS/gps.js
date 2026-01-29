@@ -559,7 +559,7 @@
             o2.disconnect();
             const css = `
               #${btnId}:hover { color: var(--color-5); filter: brightness(120%); }
-              #${btnId}.active { background-color: var(--color-1)!important; filter: brightness(120%); }
+              #${btnId}.active { background-color: var(--color-2)!important; filter: brightness(120%); }
             `;
             $("<style>").prop("type", "text/css").html(css).appendTo("head");
             $btn.on('click', () => {
