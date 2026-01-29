@@ -29,8 +29,8 @@ The following variables can be changed in the gps.json:
 	GPS_PORT: '',                  	// Connection port for GPS receiver (e.g.: 'COM1', '/dev/ttyACM0', '/dev/ttyUSB0' or 'gpsd' / if empty then GPS off
     GPS_BAUDRATE: 4800,          	// Baud rate for GPS receiver (e.g.: 4800)        
     GPS_HEIGHT: '',              	// Enter fixed altitude in m (e.g.: '160' ) or leave blank for altitude via GPS signal 
-  "GPS_HOST": "127.0.0.1",      // Server IP for gpsd support (default is 127.0.0.1)
-  "GPSD_PORT": 2947,            // Port for gpsd support (default is 2947)
+    GPS_HOST: "127.0.0.1",      	// Server IP for gpsd support (default is 127.0.0.1)
+    GPSD_PORT: 2947,            	// Port for gpsd support (default is 2947)
 	UpdateMapPos: true,		// Set the value true or false for updating the FM DX server map
 	UpdateMapInterval: 60,		// Set the interval in s (e.g.: 60) for updating the FM DX server map
 	BeepControl: false,  		// Acoustic control function for gps status (true or false)
