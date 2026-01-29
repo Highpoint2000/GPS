@@ -31,16 +31,16 @@ The following variables can be changed in the gps.json:
     GPS_HEIGHT: '',              	// Enter fixed altitude in m (e.g.: '160' ) or leave blank for altitude via GPS signal 
     GPS_HOST: "127.0.0.1",      	// Server IP for gpsd support (default is 127.0.0.1)
     GPSD_PORT: 2947,            	// Port for gpsd support (default is 2947)
-	UpdateMapPos: true,		// Set the value true or false for updating the FM DX server map
-	UpdateMapInterval: 60,		// Set the interval in s (e.g.: 60) for updating the FM DX server map
-	BeepControl: false,  		// Acoustic control function for gps status (true or false)
+	UpdateMapPos: true,				// Set the value true or false for updating the FM DX server map
+	UpdateMapInterval: 60,			// Set the interval in s (e.g.: 60) for updating the FM DX server map
+	BeepControl: false,  			// Acoustic control function for gps status (true or false)
 
 The following variables can be changed in the gps_server.js:
 
-        const SIMULATE_GPS = false;      // true = simulate GPS, false = use real GPS
-        const simulatedLat = 52.520008; // Example latitude (Berlin with small random noise)
-        const simulatedLon = 13.404954; // Example longitude (Berlin with small random noise)
-        const simulatedAlt = 35;        //height in meters
+        const SIMULATE_GPS = false;   	// true = simulate GPS, false = use real GPS
+        const simulatedLat = 52.520008;	// Example latitude (Berlin with small random noise)
+        const simulatedLon = 13.404954;	// Example longitude (Berlin with small random noise)
+        const simulatedAlt = 35;      	//height in meters
 
 ## Important notes:
 
