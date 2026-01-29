@@ -2,7 +2,8 @@
 
 This plugin provides GPS data for the FM-DX web server.
 
-![image](https://github.com/user-attachments/assets/d6f84f67-be91-4e74-9e1a-93e884d790a5)
+<img width="1464" height="797" alt="grafik" src="https://github.com/user-attachments/assets/826c1cad-891f-4d8d-a76b-cda467a1b07b" />
+
 
 ## v2.1
 
