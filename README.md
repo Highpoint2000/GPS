@@ -2,14 +2,11 @@
 
 This plugin provides GPS data for the FM-DX web server.
 
-<img width="1464" height="797" alt="grafik" src="https://github.com/user-attachments/assets/826c1cad-891f-4d8d-a76b-cda467a1b07b" />
+![image](https://github.com/user-attachments/assets/d6f84f67-be91-4e74-9e1a-93e884d790a5)
 
+## v2.0b
 
-## v2.1
-
-- Map of GPS satellites with detailed information added
-- Display of position accuracy added
-- gpsd switch to TCP communication
+- Support for additional NMEA protocol data such as $GNGGA (and other talkers like GL/GA/BD/QZ) -> support for other GPS devices like BU-353N
 
 ## Installation notes:
 
@@ -32,6 +29,8 @@ The following variables can be changed in the gps.json:
 	GPS_PORT: '',                  	// Connection port for GPS receiver (e.g.: 'COM1', '/dev/ttyACM0', '/dev/ttyUSB0' or 'gpsd' / if empty then GPS off
     GPS_BAUDRATE: 4800,          	// Baud rate for GPS receiver (e.g.: 4800)        
     GPS_HEIGHT: '',              	// Enter fixed altitude in m (e.g.: '160' ) or leave blank for altitude via GPS signal 
+  "GPS_HOST": "127.0.0.1",      // Server IP for gpsd support (default is 127.0.0.1)
+  "GPSD_PORT": 2947,            // Port for gpsd support (default is 2947)
 	UpdateMapPos: true,		// Set the value true or false for updating the FM DX server map
 	UpdateMapInterval: 60,		// Set the interval in s (e.g.: 60) for updating the FM DX server map
 	BeepControl: false,  		// Acoustic control function for gps status (true or false)
@@ -55,10 +54,6 @@ If you have any questions, would like to report problems, or have suggestions fo
 
 <details>
 <summary>History</summary>
-
-### v2.0b
-
-- Support for additional NMEA protocol data such as $GNGGA (and other talkers like GL/GA/BD/QZ) -> support for other GPS devices like BU-353N
 
 ### v2.0a
 
