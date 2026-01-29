@@ -2,11 +2,14 @@
 
 This plugin provides GPS data for the FM-DX web server.
 
-![image](https://github.com/user-attachments/assets/d6f84f67-be91-4e74-9e1a-93e884d790a5)
+<img width="1464" height="797" alt="grafik" src="https://github.com/user-attachments/assets/6529cae3-7db8-468b-9eb1-c327cd8d9998" />
 
-## v2.0b
 
-- Support for additional NMEA protocol data such as $GNGGA (and other talkers like GL/GA/BD/QZ) -> support for other GPS devices like BU-353N
+## v2.1
+
+- Map of GPS satellites with detailed information added (mouse over a satellite point)
+- Display of position accuracy added
+- gpsd switch to TCP communication
 
 ## Installation notes:
 
@@ -54,6 +57,10 @@ If you have any questions, would like to report problems, or have suggestions fo
 
 <details>
 <summary>History</summary>
+
+### v2.0b
+
+- Support for additional NMEA protocol data such as $GNGGA (and other talkers like GL/GA/BD/QZ) -> support for other GPS devices like BU-353N
 
 ### v2.0a
 
